@@ -6,7 +6,8 @@ import random
 
 class Agent:
 	def __init__(self, width, height, actions, log_dir):
-		self.learningRate = 0.001
+		#self.learningRate = 0.001
+		self.learningRate = 1e-4  # 0.0001
 		self.replayMemorySize = 10_000  # Number of states that are kept for training
 		self.minReplayMemSize = 2_000  # Min size of replay memory before training starts
 		self.batchSize = 32  # How many samples are used for training
@@ -18,8 +19,8 @@ class Agent:
 		self.model.compile(
 			#optimizer=tf.keras.optimizers.Adam(lr=self.learningRate),
 			optimizer=tf.keras.optimizers.RMSprop(lr=self.learningRate, rho=0.95, epsilon=0.01),
-			loss=tf.keras.losses.MeanSquaredError(),
-			#loss=tf.keras.losses.Huber(),
+			#loss=tf.keras.losses.MeanSquaredError(),
+			loss=tf.keras.losses.Huber(),
 			metrics=['accuracy']
 		)
 		self.targetModel = Model(width, height, self.actions)  # model for predictions
@@ -39,7 +40,15 @@ class Agent:
 		else:
 			self.replayMemory.append(transition)
 
-	# Trains main network every step during game
+	# Clip reward so it is between -1 and 1
+	def clip_reward(self, reward):
+		if reward < -1:
+			reward = -1
+		elif reward > 1:
+			reward = 1
+		return reward
+
+	# Trains main network every step during episode
 	def train(self, terminal_state, step):
 
 		# Start training only if certain number of samples is already saved
@@ -66,8 +75,9 @@ class Agent:
 		# Enumerate minibatch to prepare for fitting
 		for index, (currentState, action, reward, newCurrentState, done) in enumerate(minibatch):
 
-			# If not a terminal state, get new q from future states, otherwise set it to 0
-			if not done:
+			# If not a terminal state, get new q from future states, otherwise set it to reward
+			# life lost if reward is less than 0 (treating it as terminal)
+			if not done and reward >= 0:
 				max_future_q = np.max(futureQsList[index])
 				newQ = reward + (self.discount * max_future_q)
 			else:
@@ -86,9 +96,11 @@ class Agent:
 
 		# Fit on all minibatch and return loss and accuracy
 		#metrics = self.model.fit(np.array(X), np.array(y), batch_size=self.batchSize, verbose=0, shuffle=False)
-		metrics = self.model.fit(currentStates, batchTargets, batch_size=self.batchSize, verbose=0, shuffle=False)
+		#metrics = self.model.fit(currentStates, batchTargets, batch_size=self.batchSize, verbose=0, shuffle=False)
+		metrics = self.model.fit(currentStates, np.array(y), batch_size=self.batchSize, verbose=0, shuffle=False)
 
-		# Update target network counter every game
+
+		# Update target network counter every episode
 		if terminal_state:
 			self.targetUpdateCounter += 1
 
