@@ -56,6 +56,8 @@ agent = Agent(
 	log_dir=train_log_dir
 )
 
+agent.model.load_weights(tf.train.latest_checkpoint('checkpoints'))  # Uncomment to load from checkpoint
+
 average_reward = []
 
 # Iterate over episodes
@@ -78,7 +80,6 @@ for episode in tqdm(range(EPISODES), ascii=True, unit='episodes'):
 	currentLives = 5  # starting lives for episode
 
 	current_state = np.dstack((current_state, current_state, current_state, current_state))
-
 
 	# Reset flag and start iterating until episode ends
 	done = False
@@ -142,10 +143,11 @@ for episode in tqdm(range(EPISODES), ascii=True, unit='episodes'):
 		if len(average_accuracy) > 0:
 			tf.summary.scalar('accuracy', sum(average_accuracy) / len(average_accuracy), step=episode)
 
-
 	agent.model.save_weights(checkpoint_path.format(episode=episode))
 
-	# Decay epsilon
-	if epsilon > MIN_EPSILON:
+	# Decay epsilon. Only start when replay memory is over min size
+	if epsilon > MIN_EPSILON and agent.over_min_batch_size:
 		epsilon *= EPSILON_DECAY
 		epsilon = max(MIN_EPSILON, epsilon)
+
+agent.model.save_weights('models/' + MODEL_NAME + current_time, save_format='tf')

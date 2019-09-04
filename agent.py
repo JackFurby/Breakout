@@ -3,13 +3,15 @@ import tensorflow as tf
 import numpy as np
 import random
 
+import matplotlib.pyplot as plt
+
 
 class Agent:
-	def __init__(self, width, height, actions, log_dir):
+	def __init__(self, width, height, actions, log_dir='logs'):
 		#self.learningRate = 0.001
-		self.learningRate = 1e-4  # 0.0001
-		self.replayMemorySize = 10_000  # Number of states that are kept for training
-		self.minReplayMemSize = 2_000  # Min size of replay memory before training starts
+		self.learningRate = 0.0025
+		self.replayMemorySize = 40_000  # Number of states that are kept for training
+		self.minReplayMemSize = 4_000  # Min size of replay memory before training starts
 		self.batchSize = 32  # How many samples are used for training
 		self.updateEvery = 10  # Number of batches between updating target network
 		self.discount = 0.99  # messure of how much we care about future reward over immedate reward
@@ -30,7 +32,7 @@ class Agent:
 
 	# Queries main network for Q values given current state
 	def get_qs(self, state):
-		return self.model.predict(np.array(state).reshape(-1, *state.shape))[0]
+		return self.model.predict(state.reshape(-1, *state.shape))[0]
 
 	# Add new step to replayMemory. ReplayMemory is a first in first out list
 	def update_replay_memory(self, transition):
@@ -47,6 +49,10 @@ class Agent:
 		elif reward > 1:
 			reward = 1
 		return reward
+
+	# replay memory length is over min size
+	def over_min_batch_size():
+		return len(self.replayMemory) >= self.minReplayMemSize
 
 	# Trains main network every step during episode
 	def train(self, terminal_state, step):
