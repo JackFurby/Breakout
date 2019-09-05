@@ -1,11 +1,6 @@
 import numpy as np
-import random
-from tqdm import tqdm
 import os
-import datetime
-from PIL import Image
 import cv2
-import matplotlib.pyplot as plt
 import gym
 import tensorflow as tf
 from agent import Agent
@@ -20,14 +15,10 @@ LATEST_WEIGHTS = tf.train.latest_checkpoint('checkpoints')
 
 # Convert image to greyscale, resize and normalise pixels
 def preprocess(screen, width, height, targetWidth, targetHeight):
-	# plt.imshow(screen)
-	# plt.show()
 	screen = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)
 	screen = screen[20:300, 0:200]  # crop off score
 	screen = cv2.resize(screen, (targetWidth, targetHeight))
 	screen = screen.reshape(targetWidth, targetHeight) / 255
-	# plt.imshow(np.array(np.squeeze(screen)), cmap='gray')
-	# plt.show()
 	return screen
 
 agent = Agent(

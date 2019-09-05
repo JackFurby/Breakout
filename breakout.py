@@ -14,7 +14,8 @@ from agent import Agent
 EPISODES = 1500
 
 # Exploration settings
-epsilon = 1  # starting epsolon
+#epsilon = 1  # starting epsolon
+epsilon = 0.1  # starting epsolon
 EPSILON_DECAY = 0.998
 MIN_EPSILON = 0.1
 
@@ -99,6 +100,7 @@ for episode in tqdm(range(EPISODES), ascii=True, unit='episodes'):
 		# If life is lost then give negative reward
 		if info["ale.lives"] < currentLives:
 			reward = -1
+			done = True
 
 		reward = agent.clip_reward(reward)
 

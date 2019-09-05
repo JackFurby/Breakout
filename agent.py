@@ -3,12 +3,9 @@ import tensorflow as tf
 import numpy as np
 import random
 
-import matplotlib.pyplot as plt
-
 
 class Agent:
 	def __init__(self, width, height, actions, log_dir='logs'):
-		#self.learningRate = 0.001
 		self.learningRate = 0.0025
 		self.replayMemorySize = 40_000  # Number of states that are kept for training
 		self.minReplayMemSize = 4_000  # Min size of replay memory before training starts
@@ -19,9 +16,7 @@ class Agent:
 
 		self.model = Model(width, height, self.actions)  # model for training
 		self.model.compile(
-			#optimizer=tf.keras.optimizers.Adam(lr=self.learningRate),
 			optimizer=tf.keras.optimizers.RMSprop(lr=self.learningRate, rho=0.95, epsilon=0.01),
-			#loss=tf.keras.losses.MeanSquaredError(),
 			loss=tf.keras.losses.Huber(),
 			metrics=['accuracy']
 		)
@@ -66,16 +61,13 @@ class Agent:
 
 		# Get current states from minibatch, then query NN model for Q values
 		currentStates = np.array([transition[0] for transition in minibatch])
-		#currentQsList = self.model.predict(currentStates)
 
 		# Get future states from minibatch, then query NN model for Q values
 		newCurrentStates = np.array([transition[3] for transition in minibatch])
 		futureQsList = self.targetModel.predict(newCurrentStates)
 
-		#batchActions = np.zeros((self.batchSize, self.actions))
 		batchTargets = np.zeros((self.batchSize, self.actions))
 
-		#X = []
 		y = []
 
 		# Enumerate minibatch to prepare for fitting
@@ -90,19 +82,14 @@ class Agent:
 				newQ = reward
 
 			# Update Q value for given state
-			#currentQs = currentQsList[index]
 			action[np.argmax(action)] = newQ
 
-			#batchActions[index][action] = 1
 			batchTargets[index][np.argmax(action)] = 1
 
 			# And append to our training data
-			#X.append(currentState)
 			y.append(action)
 
 		# Fit on all minibatch and return loss and accuracy
-		#metrics = self.model.fit(np.array(X), np.array(y), batch_size=self.batchSize, verbose=0, shuffle=False)
-		#metrics = self.model.fit(currentStates, batchTargets, batch_size=self.batchSize, verbose=0, shuffle=False)
 		metrics = self.model.fit(currentStates, np.array(y), batch_size=self.batchSize, verbose=0, shuffle=False)
 
 
