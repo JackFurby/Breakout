@@ -5,7 +5,7 @@ import random
 
 
 class Agent:
-	def __init__(self, width, height, actions, log_dir='logs'):
+	def __init__(self, width, height, actions):
 		self.learningRate = 0.0025
 		self.replayMemorySize = 40_000  # Number of states that are kept for training
 		self.minReplayMemSize = 4_000  # Min size of replay memory before training starts

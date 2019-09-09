@@ -31,6 +31,8 @@ agent.model.load_weights(LATEST_WEIGHTS)
 
 while True:
 
+	currentLives = 5  # starting lives
+
 	# Reset environment and get initial state
 	current_state = env.reset()
 	current_state = preprocess(
@@ -62,5 +64,11 @@ while True:
 
 		env.render()
 
+		# If life is lost auto fire next ball
+		if info["ale.lives"] < currentLives:
+			env.step(1)
+
 		current_state = new_state
+		currentLives = info["ale.lives"]  # update lives remaining
+
 		time.sleep(1 / 30)  # lock framerate to aprox 30 fps

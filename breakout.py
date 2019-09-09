@@ -11,11 +11,11 @@ import tensorflow as tf
 from agent import Agent
 
 # Environment settings
-EPISODES = 1500
+EPISODES = 15000
 
 # Exploration settings
-#epsilon = 1  # starting epsolon
-epsilon = 0.1  # starting epsolon
+epsilon = 1  # starting epsolon
+#epsilon = 0.1  # starting epsolon
 EPSILON_DECAY = 0.998
 MIN_EPSILON = 0.1
 
@@ -53,8 +53,7 @@ checkpoint_dir = os.path.dirname(checkpoint_path)
 agent = Agent(
 	width=SAMPLE_WIDTH,
 	height=SAMPLE_HEIGHT,
-	actions=env.action_space.n,
-	log_dir=train_log_dir
+	actions=env.action_space.n
 )
 
 agent.model.load_weights(tf.train.latest_checkpoint('checkpoints'))  # Uncomment to load from checkpoint
