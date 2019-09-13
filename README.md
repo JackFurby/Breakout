@@ -17,7 +17,7 @@ The agent is formed of a number of adjustable variables, two neural networks and
 The model is formed of two convolutional layers, a flatten layer and two dense layers. This matches DeepMinds model (as far as I am aware).
 
 
-## Testing and what I have learned.
+## Testing and what I have learned
 
 ### The beginning (very poor runtime)
 
