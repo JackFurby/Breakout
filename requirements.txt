@@ -1,0 +1,7 @@
+tensorflow
+numpy
+tqdm
+Pillow
+opencv-python
+matplotlib
+gym[atari]

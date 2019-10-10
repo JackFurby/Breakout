@@ -1,7 +1,9 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 from model import Model
 import tensorflow as tf
 import numpy as np
 import random
+from collections import deque
 
 
 class Agent:
@@ -22,20 +24,16 @@ class Agent:
 		)
 		self.targetModel = Model(width, height, self.actions)  # model for predictions
 		self.targetModel.set_weights(self.model.get_weights())
-		self.replayMemory = []  # last n steps
+		self.replayMemory = deque(maxlen=self.replayMemorySize)
 		self.targetUpdateCounter = 0  # counter since last target model update
 
 	# Queries main network for Q values given current state
 	def get_qs(self, state):
 		return self.model.predict(state.reshape(-1, *state.shape))[0]
 
-	# Add new step to replayMemory. ReplayMemory is a first in first out list
+	# Add new step to replayMemory
 	def update_replay_memory(self, transition):
-		if len(self.replayMemory) >= self.replayMemorySize:
-			self.replayMemory.pop(0)
-			self.replayMemory.append(transition)
-		else:
-			self.replayMemory.append(transition)
+		self.replayMemory.append(transition)
 
 	# Clip reward so it is between -1 and 1
 	def clip_reward(self, reward):

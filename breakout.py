@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
 import random
 from tqdm import tqdm
@@ -9,6 +10,7 @@ import matplotlib.pyplot as plt
 import gym
 import tensorflow as tf
 from agent import Agent
+
 
 # Environment settings
 EPISODES = 15000
@@ -56,7 +58,7 @@ agent = Agent(
 	actions=env.action_space.n
 )
 
-agent.model.load_weights(tf.train.latest_checkpoint('checkpoints'))  # Uncomment to load from checkpoint
+# agent.model.load_weights(tf.train.latest_checkpoint('checkpoints'))  # Uncomment to load from checkpoint
 
 average_reward = []
 
